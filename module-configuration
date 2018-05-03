@@ -1,0 +1,93 @@
+#! /usr/bin/env python
+
+'''
+(c) Copyright 2018
+Widmann Roland, bbv Software Services AG
+
+SPDX-License-Identifier: GPL-3.0-only
+'''
+
+import os
+from datetime import datetime
+
+class Menu:
+
+    def __init__(self):
+        pass
+
+class ModuleConfigurator:
+
+    def __init__(self):
+        self.device_id = ''
+
+    def clear_screen(self, headline_text=''):
+        os.system('clear')
+
+        if headline_text != '':
+            print '=' * len(headline_text)
+            print headline_text
+            print '=' * len(headline_text)
+            print ''
+
+    def frame_text_in(self, text):
+        print '*' * (len(text) + 4)
+        print '*', text, '*'
+        print '*' * (len(text) + 4)
+
+    def read_certain_input(self, message_text, *options):
+        user_input = raw_input(message_text)
+
+        if len(options) > 0 and options[0] == '*':
+            return user_input
+
+        while user_input not in options:
+            user_input = raw_input(message_text)
+
+        return user_input
+
+    def start_network_configurator(self):
+        return os.system('network-configurator')
+
+    def user_verify_system_time_correct(self):
+        self.clear_screen('System time verification')
+        current_time = datetime.now().strftime('%d-%m-%Y %H:%M')
+
+        self.frame_text_in(current_time)
+        user_input = self.read_certain_input('Is this time rather correct? (Y/N)', 'Y', 'N', 'y', 'n')
+
+        if user_input in ('n', 'N'):
+            self.frame_text_in('System time has necessarily to be correct.')
+            print 'Please check if:'
+            print '- Network configuration is correct'
+            print '- Network offers access to the internet'
+            print '- If internet available please wait some time for NTP to update system time.'
+            print ''
+            print 'Module configuration will now exit - please try again later.'
+            self.read_certain_input('', '*')
+            return False
+
+        return True
+
+    def read_device_id(self):
+        self.clear_screen('Device ID')
+        self.device_id = self.read_certain_input('Please enter the device ID: ', '*')
+
+    def generate_ssh_key(self):
+        self.clear_screen()
+        print 'generating ssh-key-----'
+        self.read_certain_input('', '*')
+
+    def display_fingerprint(self):
+        self.clear_screen('Systems certificate fingerprint')
+        print 'Use following fingerprint to enter in Azure-Cloud:'
+        print ''
+        self.frame_text_in('00:11:22:33:44:55:66:77:88:99:aa:bb:cc:dd:ee:ff')
+
+
+if __name__ == '__main__':
+    module_configurator = ModuleConfigurator()
+    module_configurator.start_network_configurator()
+    module_configurator.user_verify_system_time_correct()
+    module_configurator.generate_ssh_key()
+    module_configurator.display_fingerprint()
+
